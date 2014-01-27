@@ -1,0 +1,101 @@
+<div id="content" class="home">
+
+  <!-- Introduction Message -->
+  <!-- +++++++++++++++++++++++++++++++++++++++ -->
+  
+  {% if settings.display-introduction-message %}
+    <section id="introduction-message-wrap" class="single-borders">
+      <div id="introduction-message">
+        <h1>{{ settings.introduction-tagline }}</h1>
+        <p class="more"><a href="#more-info" class="accent-text">Read More</a></p>
+      </div><!-- #introduction-message-wrap -->
+    </section>
+  {% endif %}
+  
+  <!-- Slideshow -->
+  <!-- +++++++++++++++++++++++++++++++++++++++ -->
+  
+  {% if settings.show-slideshow %}
+    <section id="slideshow-outer-wrap">
+      <div class="slideshow-tagline">
+        {% if settings.slideshow-link.size > 0 %}
+        <a href="{{ settings.slideshow-link }}">
+        {% endif %}
+        <h1>{{ settings.slideshow-tagline }}</h1>
+        {% if settings.slideshow-link.size > 0 %}
+        </a>
+        {% endif %}
+      </div>
+      <div id="slideshow-wrap">
+        <div class="slideshow-prev inactive"></div>
+        <div class="slideshow-next"></div>
+
+        <div class="slideshow">
+          {% if settings.show-slide-1 %}<div class="slide">{% if settings.slideshow-link.size > 0 %}<a href="{{ settings.slideshow-link }}">{% endif %}<img src="{{ 'slide-image-1.jpg' | asset_url }}">{% if settings.slideshow-link.size > 0 %}</a>{% endif %}</div>{% endif %}
+          {% if settings.show-slide-2 %}<div class="slide">{% if settings.slideshow-link.size > 0 %}<a href="{{ settings.slideshow-link }}">{% endif %}<img src="{{ 'slide-image-2.jpg' | asset_url }}">{% if settings.slideshow-link.size > 0 %}</a>{% endif %}</div>{% endif %}
+          {% if settings.show-slide-3 %}<div class="slide">{% if settings.slideshow-link.size > 0 %}<a href="{{ settings.slideshow-link }}">{% endif %}<img src="{{ 'slide-image-3.jpg' | asset_url }}">{% if settings.slideshow-link.size > 0 %}</a>{% endif %}</div>{% endif %}
+          {% if settings.show-slide-4 %}<div class="slide">{% if settings.slideshow-link.size > 0 %}<a href="{{ settings.slideshow-link }}">{% endif %}<img src="{{ 'slide-image-4.jpg' | asset_url }}">{% if settings.slideshow-link.size > 0 %}</a>{% endif %}</div>{% endif %}
+          {% if settings.show-slide-5 %}<div class="slide">{% if settings.slideshow-link.size > 0 %}<a href="{{ settings.slideshow-link }}">{% endif %}<img src="{{ 'slide-image-5.jpg' | asset_url }}">{% if settings.slideshow-link.size > 0 %}</a>{% endif %}</div>{% endif %}
+        </div>
+        
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Featured products -->
+  <!-- +++++++++++++++++++++++++++++++++++++++ -->
+  
+  {% if settings.display-featured-products %}
+    <section id="featured-products" class="section">
+      {% comment %}
+      <div class="section-title single-borders">
+        <h1 class="accent-text">
+          {% if settings.featured-products-title.size > 0 %} <!-- Use a custom title if one is provided -->
+            {{ settings.featured-products-title }}
+          {% else %} <!-- Use collection title if a custom title is no provided  -->
+            {{ collections[settings.featured-products-collection].title }}
+          {% endif %}
+      </h1>
+      {% endcomment %}
+    </div>
+    
+    <!-- Always renders... UNLESS the store has products but the specified collection does NOT have any products  -->
+    {% unless shop.products_count > 0 and collections.[settings.featured-products-collection].products.size == 0 %}
+      <ul class="product-list no-pagination clearfix">
+        
+        {% for product in collections.[settings.featured-products-collection].products limit: settings.featured-products-limit %}{% include 'small-product-item' %}{% endfor %}
+        
+        <!-- Display default content if the store has no products -->
+        {% if shop.products_count == 0 %}
+          {% for i in (1..4) %}{% include 'small-product-item-default' %}{% endfor %}
+        {% endif %}
+
+      </ul>
+    {% endunless %}
+    
+    <!-- ONLY renders when the store has products but the specified collection does NOT have any products -->
+    {% if shop.products_count > 0 and collections.[settings.featured-products-collection].products.size == 0 %}
+      <p id="empty-collection">No products in this collection</p>
+    {% endif %}
+
+    </section>
+  {% endif %}
+  
+  <div id="more-info" class="clearfix">
+    <h1 class="accent-text">About The Manual</h1>
+    {% assign about = pages.home-about %}
+    {% if about != blank and about.content != blank %}
+    <section id="home-about">
+      {{ about.content }}
+    </section>
+    {% endif %}
+    
+    {% assign testimonials = pages.home-testimonials %}
+    {% if testimonials != blank and testimonials.content != blank %}
+    <section id="home-testimonials">
+      {{ testimonials.content }}
+    </section>
+    {% endif %}
+  </div>
+
+</div>

@@ -1,0 +1,88 @@
+{% unless template contains 'search' %}<li>{% endunless %}
+    
+    <!-- 
+    We have to re-assign this variable depending on the 
+    page has access to either the product shopify object or
+    the item shopify object (used on search pages) 
+    -->
+    
+    {% assign itemType = product %}
+    {% if template contains 'search' %}
+        {% assign itemType = item %}
+    {% elsif template contains 'product' %}
+        {% assign itemType = prod %}
+    {% endif %}
+    
+    
+    <div class="product-image-wrap is-loading">
+      <a href="{{ product.url }}">
+        <!-- Product image -->
+  		  <img src="{{ itemType.featured_image | product_img_url: 'large' }}">
+          
+        <!-- Include sale banner if item is on sale -->
+        {% if itemType.compare_at_price_min > itemType.price_min and settings.display-sale-banner %}
+        <h2 class="accent-text">{{ settings.sale-banner-text }}</h2>
+        {% endif %}
+        
+        <!-- Product overlay for adding to cart / browse -->
+        {% comment %}
+        <div class="product-details-overlay">
+    			<div class="product-browse">
+    				<a title="See product details" href="{{ itemType.url }}">B</a>
+    			</div><!-- .product-browse -->
+          
+    			<div class="product-ajax-cart">
+    				<a {% if itemType.available == false %}title="Sorry! This item is unavailable!"{% else %}title="Click to add item to cart"{% endif %} class="{% if itemType.available == false %}unavailable{% endif %} {% if itemType.variants.size > 1 and itemType.available %}has-quick-shop{% endif %}" href="#" {% if itemType.variants.size == 1 %}data-variant-id="{{ itemType.variants[0].id }}"{% endif %} data-product-id="{{ itemType.id }}" data-product-json='{{ itemType | json | escape }}'>A</a>
+    			</div><!-- .product-ajax-cart -->
+        </div><!-- .product-details-overlay -->
+        {% endcomment %}
+      </a>
+      
+    </div> <!-- .product-image-wrap -->
+    
+    <div class="product-info" id="product-info-{{ itemType.id }}">
+        
+        <!-- Product title -->
+        <h1><a href="{{ itemType.url }}">{{ itemType.title }}</a></h1>
+        
+        <!-- Product price (switches depending on the sale condition) -->
+        {% if itemType.compare_at_price_min > itemType.price_min or itemType.compare_at_price_max > itemType.price_max %}
+          <p class="price sale accent-text" data-price="{{ itemType.price_max }}" data-price-was="{{ itemType.compare_at_price_max }}">
+            now {{ itemType.price_max | money }}
+          </p>
+          <p class="price was accent-text">
+            was {{ itemType.compare_at_price_max | money }}
+          </p>
+        {% else %}
+          {% if template == 'index' %}
+            {% for variant in product.variants limit: 1 %}
+              <p class="price accent-text">{{ variant.price | money }}</p>
+            {% endfor %}
+          {% else %}
+            {% if itemType.price_min == itemType.price_max %}
+              <p class="price accent-text">{{ itemType.price_min | money }}</p>
+            {% else %}
+              <p class="price accent-text">{{ itemType.price_min | money }} &ndash; {{ itemType.price_max | money }}</p>
+            {% endif %}
+          {% endif %}
+          
+        {% endif %}
+        
+        {% if template == 'index' %}
+        <div class="product-description">
+          {{ product.description }}
+        </div>
+        
+        <form action="/cart/add" method="post" class="product-form">
+          {% for variant in product.variants limit: 1 %}
+          <input type="hidden" name="id" value="{{ variant.id }}" />
+          {% endfor %}
+          <button class="action-btn accent-text">Add to Cart</button>
+        </form>
+        {% endif %}
+        
+    </div><!-- .product-info -->
+    
+    <!-- <input id="quick-add-json-{{ itemType.id }}"></span> -->
+
+{% unless template contains 'search' %}</li>{% endunless %}

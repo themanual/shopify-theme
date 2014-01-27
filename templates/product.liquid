@@ -1,0 +1,115 @@
+<div id="content" class="clearfix product-page {% if product.images.size > 0 %}product-showcase{% endif %}">
+
+  <!-- Page title -->
+  <!-- +++++++++++++++++++++++++++++++++++++++ -->
+
+  <div class="page-title has-description">
+    <h1>{{ product.title }}</h1>
+    <!--<h2>{{ product.vendor }}</h2>-->
+  </div>
+
+  <!-- Product image viewer -->
+  <!-- +++++++++++++++++++++++++++++++++++++++ -->
+
+  <section id="product-image-viewer" class="no-top-border {% if product.images.size == 1 %}no-thumbs{% endif %}">
+
+    <div id="product-image-showcase">
+      <img src="{{ product.featured_image | product_img_url: 'original' }}">
+    </div>
+
+    {% if product.images.size > 1 %}
+      <ul id="product-image-thumbnails">
+        {% for image in product.images %}
+          <li><img src="{{ image.src | product_img_url: 'small' }}" data-high-res-url="{{ image.src | product_img_url: 'original' }}" class="{% if forloop.first %}first active{% endif %} {% if forloop.last %}last{% endif %}"></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+  </section>
+
+  <!-- Product details -->
+  <!-- +++++++++++++++++++++++++++++++++++++++ -->
+
+  <form action="/cart/add" method="post">
+    <section id="product-details">
+      
+      <!-- Product Variants -->
+      {% if product.available %} <!-- If the product is available then... -->
+
+        {% if product.variants.size > 1 %} <!-- Create a variants dropdown IF the product has more than one variant -->
+        
+        <ul id="product-variants">
+          <li>
+            <select name="id" id="product-select" class="js-styled">
+              {% if product.price_min == product.price_max %}
+              {% for variant in product.variants %}
+                <option value="{{ variant.id }}">{{ variant.title }}</option>
+              {% endfor %}
+              {% else %}
+              {% for variant in product.variants %}
+                <option value="{{ variant.id }}">{{ variant.title }} - {{ variant.price | money }}</option>
+              {% endfor %}
+              {% endif %}
+            </select>
+          </li>
+        </ul>
+
+        {% else %} <!-- If the product only has one variant, create a hidden input with the variant id. NOTE: Necessary for "add to cart" to work -->
+
+          {% for variant in product.variants %}
+            <input type="hidden" name="id" value="{{ variant.id }}" />
+          {% endfor %}
+
+        {% endif %}
+
+      {% endif %}
+      
+      <!-- Product Price / Add to Cart -->
+      <ul id="product-add-to-cart" class="{% if product.variants.size == 1 or product.available == false %}no-variants{% endif %} {% if product.description.size == 0 %}no-description{% endif %}">
+        <li id="product-price">
+          {% if product.variants.size == 1 %}
+            {% if product.compare_at_price_min > product.price_min %}
+              <p class="price sale accent-text" data-price="{{ product.price_min }}">{{ product.price_min | money }}</p>
+              <p class="price was accent-text">{{ product.compare_at_price_min | money }}</p>
+            {% else %}
+              <p class="price accent-text">{{ product.price_min | money }}</p>
+            {% endif %}
+          {% elsif product.variants.size > 1 %}
+            {% if product.price_min == product.price_max %}
+              <p class="price accent-text">{{ product.price_min | money }}</p>
+            {% endif %}
+          {% endif %}
+        </li>
+        <li id="product-add">
+          <button class="action-btn accent-text" id="add-to-cart">Add</button>
+          <input id="product-submit" type="submit">
+        </li>   
+      </ul>
+      
+       <!-- Product description -->
+      {% if product.description.size > 0 %}
+        <div id="product-description" class="rte">
+          {{ product.description }}
+        </div>
+      {% endif %}
+
+    </section>
+  </form>
+
+  <!-- Related products -->
+  <!-- +++++++++++++++++++++++++++++++++++++++ -->
+
+  {% include 'related-products' %}
+
+  <!-- Breadcrumbs -->
+  <!-- +++++++++++++++++++++++++++++++++++++++ -->    
+  {% include 'breadcrumbs' %}
+
+</div>
+
+<!-- Product page specific JS -->
+<!-- +++++++++++++++++++++++++++++++++++++++ -->
+
+<script type="text/javascript" charset="utf-8">
+  {% include 'selectOptions' %}
+</script>
